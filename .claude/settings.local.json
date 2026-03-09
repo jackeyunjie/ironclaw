@@ -3,7 +3,9 @@
     "allow": [
       "WebSearch",
       "Bash(git init:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(git push:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
