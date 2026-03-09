@@ -1,0 +1,152 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="card" style="padding: 12px 16px;">
+    <view style="display: flex; gap: 12px;">
+      <view style="flex: 1; background: #f5f5f5; border-radius: 20px; padding: 8px 16px; display: flex; align-items: center;">
+        <text style="color: #999; margin-right: 8px;">🔍</text>
+        <input 
+          type="text" 
+          placeholder="搜索政策名称" 
+          value="{{keyword}}"
+          bindinput="onKeywordInput"
+          confirm-type="search"
+          bindconfirm="onSearch"
+          style="flex: 1; font-size: 14px;"
+        />
+      </view>
+      <view class="btn btn-default" style="padding: 8px 16px;" bindtap="showFilter">
+        筛选
+      </view>
+    </view>
+    
+    <!-- 筛选标签 -->
+    <view style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;" wx:if="{{selectedFilters.length > 0}}">
+      <view 
+        class="tag tag-blue" 
+        wx:for="{{selectedFilters}}" 
+        wx:key="*this"
+        style="display: flex; align-items: center;"
+      >
+        {{item}}
+        <text style="margin-left: 4px;" bindtap="removeFilter" data-filter="{{item}}">×</text>
+      </view>
+      <view class="text-gray text-small" bindtap="clearFilters" style="line-height: 24px;">
+        清除全部
+      </view>
+    </view>
+  </view>
+
+  <!-- 政策列表 -->
+  <view class="policy-card" wx:for="{{policies}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+    <view class="policy-header">
+      <view class="policy-title">{{item.name}}</view>
+      <view class="tag {{item.status === '即将截止' ? 'tag-orange' : item.status === '申报中' ? 'tag-green' : 'tag-blue'}}">
+        {{item.status}}
+      </view>
+    </view>
+    
+    <view class="policy-meta">
+      <view class="tag tag-gray">{{item.category}}</view>
+      <view class="tag tag-blue">{{item.level}}</view>
+    </view>
+    
+    <view style="margin-top: 8px; color: #8c8c8c; font-size: 12px;">
+      发布部门：{{item.department}}
+    </view>
+    
+    <view class="policy-footer">
+      <view class="countdown {{item.daysRemaining <= 3 ? 'urgent' : ''}}">
+        <text wx:if="{{item.applyEndDate}}">
+          截止：{{item.applyEndDate}}
+          <text wx:if="{{item.daysRemaining > 0}}">(剩余{{item.daysRemaining}}天)</text>
+        </text>
+      </view>
+      <view wx:if="{{item.benefits && item.benefits.length > 0}}" style="color: #52c41a; font-size: 12px;">
+        💰 {{item.benefits[0].amount}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view style="text-align: center; padding: 16px; color: #8c8c8c;" wx:if="{{loading}}">
+    加载中...
+  </view>
+  <view style="text-align: center; padding: 16px; color: #8c8c8c;" wx:if="{{!loading && !hasMore && policies.length > 0}}">
+    没有更多了
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && policies.length === 0}}">
+    <view style="font-size: 48px; margin-bottom: 16px;">📋</view>
+    <view>暂无政策数据</view>
+    <view class="text-gray text-small mt-8">试试其他搜索条件</view>
+  </view>
+
+  <!-- 筛选弹窗 -->
+  <view class="filter-popup" wx:if="{{showFilterPopup}}" bindtap="hideFilter">
+    <view class="filter-content" catchtap="stopPropagation">
+      <view class="flex-between" style="padding: 16px; border-bottom: 1px solid #f0f0f0;">
+        <view class="text-large text-bold">筛选条件</view>
+        <view bindtap="hideFilter">✕</view>
+      </view>
+      
+      <scroll-view scroll-y style="max-height: 400px; padding: 16px;">
+        <!-- 政策类别 -->
+        <view style="margin-bottom: 16px;">
+          <view style="font-weight: 500; margin-bottom: 12px;">政策类别</view>
+          <view style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <view 
+              class="tag {{selectedCategory === item ? 'tag-blue' : 'tag-gray'}}" 
+              wx:for="{{categories}}" 
+              wx:key="*this"
+              bindtap="selectCategory"
+              data-value="{{item}}"
+              style="cursor: pointer;"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+        
+        <!-- 政策级别 -->
+        <view style="margin-bottom: 16px;">
+          <view style="font-weight: 500; margin-bottom: 12px;">政策级别</view>
+          <view style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <view 
+              class="tag {{selectedLevel === item ? 'tag-blue' : 'tag-gray'}}" 
+              wx:for="{{levels}}" 
+              wx:key="*this"
+              bindtap="selectLevel"
+              data-value="{{item}}"
+              style="cursor: pointer;"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+        
+        <!-- 申报状态 -->
+        <view style="margin-bottom: 16px;">
+          <view style="font-weight: 500; margin-bottom: 12px;">申报状态</view>
+          <view style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <view 
+              class="tag {{selectedStatus === item ? 'tag-blue' : 'tag-gray'}}" 
+              wx:for="{{statuses}}" 
+              wx:key="*this"
+              bindtap="selectStatus"
+              data-value="{{item}}"
+              style="cursor: pointer;"
+            >
+              {{item}}
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <view style="display: flex; gap: 12px; padding: 16px; border-top: 1px solid #f0f0f0;">
+        <view class="btn btn-default" style="flex: 1;" bindtap="resetFilter">重置</view>
+        <view class="btn btn-primary" style="flex: 1;" bindtap="confirmFilter">确定</view>
+      </view>
+    </view>
+  </view>
+</view>

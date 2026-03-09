@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.beijing.gov.cn)",
+      "WebFetch(domain:mp.weixin.qq.com)"
+    ]
+  }
+}

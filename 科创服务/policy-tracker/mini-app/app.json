@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/policies/policies",
+    "pages/policy-detail/policy-detail",
+    "pages/enterprise/enterprise",
+    "pages/applications/applications"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1890ff",
+    "navigationBarTitleText": "政策跟踪器",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1890ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/policies/policies",
+        "text": "政策",
+        "iconPath": "images/policy.png",
+        "selectedIconPath": "images/policy-active.png"
+      },
+      {
+        "pagePath": "pages/applications/applications",
+        "text": "申报",
+        "iconPath": "images/application.png",
+        "selectedIconPath": "images/application-active.png"
+      },
+      {
+        "pagePath": "pages/enterprise/enterprise",
+        "text": "我的",
+        "iconPath": "images/user.png",
+        "selectedIconPath": "images/user-active.png"
+      }
+    ]
+  },
+  "usingComponents": {},
+  "permission": {
+    "scope.userLocation": {
+      "desc": "您的位置信息将用于推荐本地政策"
+    }
+  },
+  "sitemapLocation": "sitemap.json"
+}

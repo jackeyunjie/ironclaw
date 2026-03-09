@@ -1,0 +1,112 @@
+<view class="container">
+  <!-- 欢迎区域 -->
+  <view class="card">
+    <view class="flex-between">
+      <view>
+        <view class="text-large text-bold">欢迎回来</view>
+        <view class="text-gray mt-8">{{enterpriseName || '企业用户'}}</view>
+      </view>
+      <view class="tag tag-blue">{{enterpriseScale || '未设置'}}</view>
+    </view>
+  </view>
+
+  <!-- 统计区域 -->
+  <view class="card">
+    <view class="card-title">数据概览</view>
+    <view style="display: flex; gap: 12px;">
+      <view class="stat-card" style="flex: 1;">
+        <view class="stat-value">{{matchedCount}}</view>
+        <view class="stat-label">匹配政策</view>
+      </view>
+      <view class="stat-card" style="flex: 1;">
+        <view class="stat-value" style="color: #fa8c16;">{{closingCount}}</view>
+        <view class="stat-label">即将截止</view>
+      </view>
+      <view class="stat-card" style="flex: 1;">
+        <view class="stat-value" style="color: #52c41a;">{{applyingCount}}</view>
+        <view class="stat-label">申报中</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐政策 -->
+  <view class="card" wx:if="{{matchedPolicies.length > 0}}">
+    <view class="flex-between" style="margin-bottom: 12px;">
+      <view class="card-title">为您推荐</view>
+      <view class="text-primary text-small" bindtap="goToPolicies">查看更多</view>
+    </view>
+    
+    <view 
+      class="policy-card" 
+      wx:for="{{matchedPolicies}}" 
+      wx:key="id"
+      bindtap="goToPolicyDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="policy-header">
+        <view class="policy-title">{{item.name}}</view>
+        <view class="tag {{item.status === '即将截止' ? 'tag-orange' : 'tag-green'}}">
+          {{item.status}}
+        </view>
+      </view>
+      <view class="policy-meta">
+        <view class="tag tag-gray">{{item.category}}</view>
+        <view class="tag tag-blue">{{item.level}}</view>
+        <view wx:if="{{item.matchScore}}" class="tag tag-green">匹配度 {{item.matchScore}}分</view>
+      </view>
+      <view class="policy-footer">
+        <view class="countdown {{item.daysRemaining <= 3 ? 'urgent' : ''}}">
+          <text wx:if="{{item.applyEndDate}}">
+            截止：{{item.applyEndDate}} 
+            <text wx:if="{{item.daysRemaining > 0}}">(剩余{{item.daysRemaining}}天)</text>
+          </text>
+        </view>
+        <view class="btn btn-primary" style="padding: 6px 16px; font-size: 12px;">
+          查看详情
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 即将截止 -->
+  <view class="card" wx:if="{{closingPolicies.length > 0}}">
+    <view class="flex-between" style="margin-bottom: 12px;">
+      <view class="card-title">即将截止</view>
+      <view class="text-primary text-small" bindtap="goToPolicies">查看更多</view>
+    </view>
+    
+    <view 
+      class="policy-card" 
+      wx:for="{{closingPolicies}}" 
+      wx:key="id"
+      bindtap="goToPolicyDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="policy-header">
+        <view class="policy-title">{{item.name}}</view>
+        <view class="tag tag-orange">{{item.status}}</view>
+      </view>
+      <view class="policy-meta">
+        <view class="tag tag-gray">{{item.category}}</view>
+        <view class="countdown urgent">
+          <text wx:if="{{item.applyEndDate}}">
+            剩余 {{item.daysRemaining}} 天
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && matchedPolicies.length === 0 && closingPolicies.length === 0}}">
+    <view style="font-size: 48px; margin-bottom: 16px;">📋</view>
+    <view>暂无政策数据</view>
+    <view class="text-gray text-small mt-8">请完善企业信息以获取推荐</view>
+    <view class="btn btn-primary mt-16" bindtap="goToEnterprise">完善信息</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <view style="color: #8c8c8c;">加载中...</view>
+  </view>
+</view>
