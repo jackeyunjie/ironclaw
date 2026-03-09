@@ -1,0 +1,100 @@
+<view class="container">
+  <!-- 未登录状态 -->
+  <view wx:if="{{!userInfo}}" class="login-section">
+    <view class="login-box">
+      <image class="logo" src="/images/logo.png" mode="aspectFit"/>
+      <text class="title">政策跟踪器</text>
+      <text class="subtitle">让企业申报更简单</text>
+      <button class="btn-wechat" bindtap="wxLogin">
+        <text class="icon">微信</text>
+        微信一键登录
+      </button>
+    </view>
+  </view>
+
+  <!-- 已登录状态 -->
+  <block wx:else>
+    <!-- 用户信息卡片 -->
+    <view class="user-card">
+      <view class="user-header">
+        <image class="avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"/>
+        <view class="user-info">
+          <text class="username">{{userInfo.username || '用户'}}</text>
+          <text class="company">{{enterprise?.name || '未绑定企业'}}</text>
+        </view>
+        <text class="edit-btn" bindtap="editEnterprise">编辑</text>
+      </view>
+
+      <!-- 统计数据 -->
+      <view class="stats-section" wx:if="{{enterprise}}">
+        <view class="stat-item" bindtap="viewApplications">
+          <text class="stat-value">{{statistics.totalApplications}}</text>
+          <text class="stat-label">申报总数</text>
+        </view>
+        <view class="stat-item" bindtap="viewApproved">
+          <text class="stat-value">{{statistics.approvedApplications}}</text>
+          <text class="stat-label">已获批</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value highlight">{{statistics.totalApprovedAmount || 0}}</text>
+          <text class="stat-label">获批金额(万)</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 企业信息 -->
+    <view class="section-card" wx:if="{{enterprise}}">
+      <view class="section-title">企业信息</view>
+      <view class="info-list">
+        <view class="info-row">
+          <text class="label">企业规模</text>
+          <text class="value">{{enterprise.scale || '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">所属行业</text>
+          <text class="value">{{enterprise.industry || '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">注册时间</text>
+          <text class="value">{{enterprise.registerDate || '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">企业地址</text>
+          <text class="value">{{enterprise.city || '-'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="menu-card">
+      <view class="menu-item" bindtap="notificationSettings">
+        <view class="menu-icon">
+          <text class="iconfont">🔔</text>
+        </view>
+        <text class="menu-text">通知设置</text>
+        <text class="arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="showHelp">
+        <view class="menu-icon">
+          <text class="iconfont">❓</text>
+        </view>
+        <text class="menu-text">帮助中心</text>
+        <text class="arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="contactUs">
+        <view class="menu-icon">
+          <text class="iconfont">📞</text>
+        </view>
+        <text class="menu-text">联系我们</text>
+        <text class="arrow">></text>
+      </view>
+      <view class="menu-item" bindtap="logout">
+        <view class="menu-icon">
+          <text class="iconfont">🚪</text>
+        </view>
+        <text class="menu-text">退出登录</text>
+        <text class="arrow">></text>
+      </view>
+    </view>
+  </block>
+</view>

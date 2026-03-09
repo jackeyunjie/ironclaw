@@ -1,0 +1,95 @@
+<view class="container">
+  <!-- Tab切换 -->
+  <view class="tab-bar">
+    <view class="tab-item {{activeTab === 'active' ? 'active' : ''}}" data-tab="active" bindtap="switchTab">
+      进行中
+    </view>
+    <view class="tab-item {{activeTab === 'completed' ? 'active' : ''}}" data-tab="completed" bindtap="switchTab">
+      已结束
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <view class="loading-spinner"></view>
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{getFilteredApplications().length === 0}}" class="empty-state">
+    <image src="/images/empty.png" mode="aspectFit" class="empty-icon"/>
+    <text class="empty-text">暂无{{activeTab === 'active' ? '进行中' : '已结束'}}的申报</text>
+    <button class="btn-primary" bindtap="goToPolicies">去发现政策</button>
+  </view>
+
+  <!-- 申报列表 -->
+  <view wx:else class="applications-list">
+    <view
+      wx:for="{{getFilteredApplications()}}"
+      wx:key="id"
+      class="application-card"
+      data-id="{{item.id}}"
+      bindtap="goToDetail"
+    >
+      <!-- 头部 -->
+      <view class="card-header">
+        <text class="policy-name">{{item.policyName || '政策申报'}}</text>
+        <view class="status-badge" style="background: {{item.statusColor}};">
+          {{item.statusText}}
+        </view>
+      </view>
+
+      <!-- 进度条 -->
+      <view class="progress-section">
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{item.progressPercent}}%; background: {{item.statusColor}};"></view>
+        </view>
+        <text class="progress-text">{{item.progressPercent}}%</text>
+      </view>
+
+      <!-- 信息 -->
+      <view class="info-section">
+        <view class="info-item">
+          <text class="info-label">创建时间：</text>
+          <text class="info-value">{{item.createdAt}}</text>
+        </view>
+        <view class="info-item" wx:if="{{item.submittedAt}}">
+          <text class="info-label">提交时间：</text>
+          <text class="info-value">{{item.submittedAt}}</text>
+        </view>
+        <view class="info-item" wx:if="{{item.approvedAmount}}">
+          <text class="info-label">获批金额：</text>
+          <text class="info-value highlight">{{item.approvedAmount}}万元</text>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="action-section" catchtap="stopPropagation">
+        <button
+          wx:if="{{item.status === '待开始' || item.status === '准备中'}}"
+          class="btn-primary small"
+          data-id="{{item.id}}"
+          bindtap="goToDetail"
+        >
+          继续准备
+        </button>
+        <button
+          wx:elif="{{item.status === '待提交'}}"
+          class="btn-primary small"
+          data-id="{{item.id}}"
+          bindtap="goToDetail"
+        >
+          立即提交
+        </button>
+        <button
+          wx:else
+          class="btn-default small"
+          data-id="{{item.id}}"
+          bindtap="goToDetail"
+        >
+          查看详情
+        </button>
+      </view>
+    </view>
+  </view>
+</view>
