@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import MainLayout from './layouts/MainLayout';
-import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
 import Policies from './pages/Policies';
 import PolicyDetail from './pages/PolicyDetail';
 import Enterprise from './pages/Enterprise';
@@ -30,7 +30,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/" element={<MainLayout />}>
-              <Route index element={<Home />} />
+              <Route index element={<Dashboard />} />
               <Route path="policies" element={<Policies />} />
               <Route path="policies/:id" element={<PolicyDetail />} />
               <Route path="enterprise" element={<Enterprise />} />

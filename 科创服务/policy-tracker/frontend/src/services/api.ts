@@ -65,6 +65,19 @@ export const enterpriseApi = {
   getStatistics: (id: string) => api.get(`/enterprises/${id}/statistics`),
 };
 
+// 申报相关API
+export const applicationApi = {
+  getList: (params?: any) => api.get('/applications', { params }),
+  getById: (id: string) => api.get(`/applications/${id}`),
+  getByEnterprise: (enterpriseId: string) =>
+    api.get('/applications', { params: { enterpriseId } }),
+  create: (data: any) => api.post('/applications', data),
+  update: (id: string, data: any) => api.put(`/applications/${id}`, data),
+  updateStatus: (id: string, status: string) =>
+    api.patch(`/applications/${id}/status`, { status }),
+  delete: (id: string) => api.delete(`/applications/${id}`),
+};
+
 // 认证相关API
 export const authApi = {
   login: (username: string, password: string) =>
