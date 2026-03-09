@@ -1,26 +1,54 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
 
+# Production builds
+dist/
+build/
+*.tsbuildinfo
+
+# Environment variables
 .env
 .env.local
-.env.*
-!.env.example
+.env.*.local
 
-# Claude Code worktrees and lock files
-.claude/worktrees/
-.claude/scheduled_tasks.lock
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# Sidecar tool data
-.sidecar/
-.todos/
+# OS
+.DS_Store
+Thumbs.db
 
-target/
+# Logs
+logs/
+*.log
 
-# Benchmark results (local runs, not committed)
-bench-results/
+# Testing
+coverage/
+.nyc_output/
 
-# Coverage reports (local runs, not committed)
-/coverage/
+# Database
+*.db
+*.sqlite
 
-# WASM build artifacts (loaded from disk, not bundled)
-*.wasm
+# Temporary files
+tmp/
+temp/
+*.tmp
 
-trace_*.json
+# Gitea data (local development)
+gitea/data/
+
+# Mini-app dist
+mini-app/dist/
+
+# Frontend dist
+frontend/dist/
