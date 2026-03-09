@@ -9,6 +9,8 @@
 - 📋 **材料清单管理** - 自动生成申报材料清单，支持AI辅助撰写
 - 🔔 **智能提醒** - 多渠道提醒（微信/短信/邮件/APP推送）
 - 🤖 **AI能力** - 政策解析、材料生成、智能问答
+- 📊 **数据可视化** - 申报统计、政策分析看板
+- 📱 **微信小程序** - 随时随地跟踪政策动态
 
 ## 技术栈
 
@@ -17,17 +19,18 @@
 - **数据库**: PostgreSQL + TypeORM
 - **缓存**: Redis
 - **搜索**: Elasticsearch
-- **AI**: OpenAI GPT-4 / 文心一言
+- **文件存储**: MinIO
+- **AI**: OpenAI GPT-4
 
 ### 前端
 - **框架**: React 18 + TypeScript
 - **UI库**: Ant Design
 - **状态管理**: React Query
 - **路由**: React Router
+- **图表**: Recharts
 
 ### 小程序
-- **框架**: Taro 3.x
-- **UI库**: Taro UI
+- **框架**: 微信小程序原生
 
 ## 项目结构
 
@@ -39,37 +42,60 @@ policy-tracker/
 │   │   │   ├── auth/     # 认证模块
 │   │   │   ├── enterprise/  # 企业模块
 │   │   │   ├── policy/   # 政策模块
-│   │   │   └── ai/       # AI模块
+│   │   │   ├── application/  # 申报模块
+│   │   │   ├── ai/       # AI模块
+│   │   │   ├── notification/ # 通知模块
+│   │   │   └── scraper/  # 政策爬虫模块
 │   │   ├── entities/     # 数据库实体
-│   │   ├── dto/          # 数据传输对象
 │   │   └── config/       # 配置文件
 │   └── package.json
 ├── frontend/             # 前端应用
 │   ├── src/
 │   │   ├── pages/        # 页面组件
-│   │   ├── components/   # 公共组件
+│   │   ├── layouts/      # 布局组件
 │   │   ├── services/     # API服务
 │   │   └── types/        # TypeScript类型
 │   └── package.json
-└── mini-app/             # 微信小程序
-    └── src/
+├── mini-app/             # 微信小程序
+│   ├── pages/            # 小程序页面
+│   └── app.json
+├── nginx/                # Nginx配置
+├── scripts/              # 脚本工具
+└── docker-compose.yml    # Docker编排
 ```
 
 ## 快速开始
 
-### 环境要求
+### Docker一键部署（推荐）
+
+```bash
+# 克隆项目
+git clone https://github.com/jackeyunjie/ironclaw.git
+cd ironclaw/科创服务/policy-tracker
+
+# 启动所有服务
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
+
+# 导入初始政策数据
+docker-compose exec backend npm run seed
+```
+
+访问地址：
+- 前端应用：http://localhost
+- API文档：http://localhost/api/docs
+- MinIO控制台：http://localhost:9001
+
+### 本地开发
+
+#### 环境要求
 - Node.js >= 18
 - PostgreSQL >= 14
 - Redis >= 6
 
-### 1. 克隆项目
-
-```bash
-git clone <repository-url>
-cd policy-tracker
-```
-
-### 2. 启动后端服务
+#### 1. 启动后端服务
 
 ```bash
 cd backend
@@ -79,16 +105,18 @@ npm install
 
 # 配置环境变量
 cp .env.example .env
-# 编辑 .env 文件，配置数据库等参数
+# 编辑 .env 文件
+
+# 运行数据库迁移
+npm run migration:run
 
 # 启动开发服务器
 npm run start:dev
 ```
 
-后端服务将在 http://localhost:3000 启动
-API文档: http://localhost:3000/api/docs
+后端服务：http://localhost:3000
 
-### 3. 启动前端应用
+#### 2. 启动前端应用
 
 ```bash
 cd frontend
@@ -98,24 +126,18 @@ npm install
 
 # 配置环境变量
 cp .env.example .env
-# 编辑 .env 文件，配置API地址
 
 # 启动开发服务器
 npm run dev
 ```
 
-前端应用将在 http://localhost:5173 启动
+前端应用：http://localhost:5173
 
-### 4. 数据库迁移
+#### 3. 导入政策数据
 
 ```bash
-cd backend
-
-# 生成迁移文件
-npm run migration:generate -- -n InitialMigration
-
-# 执行迁移
-npm run migration:run
+cd scripts
+node import-data.js
 ```
 
 ## 核心功能模块
@@ -125,6 +147,7 @@ npm run migration:run
 - 政策状态自动更新（即将开始/申报中/即将截止/已截止）
 - 政策分类和标签
 - 政策搜索和筛选
+- 政策爬虫自动采集
 
 ### 企业管理
 - 企业信息管理
@@ -143,6 +166,11 @@ npm run migration:run
 - 进度跟踪
 - 结果反馈
 
+### 通知系统
+- 政策截止提醒
+- 申报结果通知
+- 多渠道推送（邮件/微信/短信）
+
 ### AI能力
 - 政策自动解析（从PDF/网页提取信息）
 - 材料智能生成
@@ -150,49 +178,101 @@ npm run migration:run
 
 ## API接口
 
-### 认证接口
-- POST /api/v1/auth/login - 用户登录
-- POST /api/v1/auth/register - 用户注册
-- POST /api/v1/auth/change-password - 修改密码
+详细API文档请访问：`http://localhost/api/docs` (Swagger UI)
 
-### 政策接口
-- GET /api/v1/policies - 获取政策列表
-- GET /api/v1/policies/:id - 获取政策详情
-- POST /api/v1/policies - 创建政策
-- PUT /api/v1/policies/:id - 更新政策
-- DELETE /api/v1/policies/:id - 删除政策
-- GET /api/v1/policies/match - 匹配政策
-- GET /api/v1/policies/upcoming - 即将开始
-- GET /api/v1/policies/closing - 即将截止
+主要接口：
 
-### 企业接口
-- GET /api/v1/enterprises - 获取企业列表
-- GET /api/v1/enterprises/:id - 获取企业详情
-- POST /api/v1/enterprises - 创建企业
-- PUT /api/v1/enterprises/:id - 更新企业
-- DELETE /api/v1/enterprises/:id - 删除企业
-- POST /api/v1/enterprises/:id/track-policy - 关注政策
-- POST /api/v1/enterprises/:id/untrack-policy - 取消关注
+### 认证
+- `POST /api/v1/auth/login` - 用户登录
+- `POST /api/v1/auth/register` - 用户注册
+- `POST /api/v1/auth/wechat-login` - 微信登录
 
-## 部署
+### 政策
+- `GET /api/v1/policies` - 获取政策列表
+- `GET /api/v1/policies/match` - 匹配政策
+- `GET /api/v1/policies/upcoming` - 即将开始
+- `GET /api/v1/policies/closing` - 即将截止
 
-### Docker部署
+### 企业
+- `GET /api/v1/enterprises/:id` - 获取企业详情
+- `PUT /api/v1/enterprises/:id` - 更新企业信息
+- `GET /api/v1/enterprises/:id/statistics` - 获取统计
+
+### 申报
+- `POST /api/v1/applications` - 创建申报
+- `GET /api/v1/applications` - 获取申报列表
+- `PATCH /api/v1/applications/:id/status` - 更新状态
+
+### AI
+- `POST /api/v1/ai/parse-policy` - 解析政策
+- `POST /api/v1/ai/generate-material` - 生成材料
+- `POST /api/v1/ai/chat` - 智能问答
+
+## 部署指南
+
+详细部署说明请查看 [DEPLOY.md](./DEPLOY.md)
+
+### 生产环境部署步骤
+
+1. **准备服务器**
+   ```bash
+   # 安装 Docker 和 Docker Compose
+   curl -fsSL https://get.docker.com | sh
+   ```
+
+2. **克隆代码**
+   ```bash
+   git clone https://github.com/jackeyunjie/ironclaw.git
+   cd ironclaw/科创服务/policy-tracker
+   ```
+
+3. **配置环境**
+   ```bash
+   # 编辑环境变量
+   vim backend/.env
+
+   # 配置SSL证书（如需HTTPS）
+   mkdir -p nginx/ssl
+   cp your-cert.crt nginx/ssl/
+   cp your-key.key nginx/ssl/
+   ```
+
+4. **启动服务**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+5. **运行迁移**
+   ```bash
+   docker-compose exec backend npm run migration:run
+   ```
+
+6. **导入数据**
+   ```bash
+   docker-compose exec backend npm run seed
+   ```
+
+## 数据备份
 
 ```bash
-# 构建镜像
-docker-compose build
+# 手动备份
+./scripts/backup.sh
 
-# 启动服务
-docker-compose up -d
+# 自动备份（添加到crontab）
+0 2 * * * /path/to/policy-tracker/scripts/backup.sh
 ```
 
-### 生产环境部署
+## 开发计划
 
-1. 配置生产环境变量
-2. 构建前端资源
-3. 配置Nginx反向代理
-4. 配置SSL证书
-5. 启动后端服务
+- [x] 基础架构搭建
+- [x] 后端API开发
+- [x] 前端Web应用
+- [x] 微信小程序
+- [x] AI能力集成
+- [x] Docker部署
+- [ ] 移动端App（Flutter）
+- [ ] 数据大屏可视化
+- [ ] 智能推荐算法优化
 
 ## 贡献指南
 
@@ -208,4 +288,9 @@ docker-compose up -d
 
 ## 联系方式
 
-如有问题或建议，欢迎提交 Issue 或联系开发团队。
+- GitHub Issues: https://github.com/jackeyunjie/ironclaw/issues
+- 项目地址: https://github.com/jackeyunjie/ironclaw
+
+---
+
+Made with ❤️ by Policy Tracker Team
