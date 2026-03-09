@@ -3,3 +3,4 @@ export * from './enterprise.entity';
 export * from './policy.entity';
 export * from './application-task.entity';
 export * from './notification.entity';
+export * from './approval-record.entity';

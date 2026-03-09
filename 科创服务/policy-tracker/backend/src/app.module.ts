@@ -14,9 +14,10 @@ import { ApplicationModule } from './modules/application/application.module';
 import { AiModule } from './modules/ai/ai.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { ScraperModule } from './modules/scraper/scraper.module';
+import { WorkflowModule } from './modules/workflow/workflow.module';
 
 // Entities
-import { User, Enterprise, Policy, ApplicationTask, Notification } from './entities';
+import { User, Enterprise, Policy, ApplicationTask, Notification, ApprovalRecord } from './entities';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { User, Enterprise, Policy, ApplicationTask, Notification } from './entit
         username: configService.get('DB_USERNAME', 'postgres'),
         password: configService.get('DB_PASSWORD', 'password'),
         database: configService.get('DB_NAME', 'policy_tracker'),
-        entities: [User, Enterprise, Policy, ApplicationTask, Notification],
+        entities: [User, Enterprise, Policy, ApplicationTask, Notification, ApprovalRecord],
         synchronize: configService.get('NODE_ENV') !== 'production',
         logging: configService.get('NODE_ENV') === 'development',
       }),
@@ -47,6 +48,7 @@ import { User, Enterprise, Policy, ApplicationTask, Notification } from './entit
     AiModule,
     NotificationModule,
     ScraperModule,
+    WorkflowModule,
   ],
 })
 export class AppModule {}
